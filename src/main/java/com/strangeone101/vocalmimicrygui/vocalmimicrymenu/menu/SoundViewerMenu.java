@@ -4,6 +4,9 @@ import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.SoundBreakdown;
 import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.VocalMimicryMenu;
 import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources.MenuBase;
 import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources.MenuItem;
+import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapper;
+import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapperBase;
+import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundsContainer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -17,19 +20,19 @@ public class SoundViewerMenu extends MenuBase {
 
     private static Map<Player, SoundViewerMenu> LAST_OPEN = new HashMap<>();
 
-    private SoundBreakdown.SoundWrapper selected;
-    private SoundBreakdown.SoundsContainer open;
+    private SoundWrapper selected;
+    private SoundsContainer open;
     private int page;
     private SoundViewerMenu prev;
     private final SoundViewerMenu instance = this;
 
-    public SoundViewerMenu(SoundBreakdown.SoundsContainer soundsContainer) {
+    public SoundViewerMenu(SoundsContainer soundsContainer) {
         super(getTitle(soundsContainer), getRowSize(soundsContainer));
 
         this.open = soundsContainer;
     }
 
-    public static int getRowSize(SoundBreakdown.SoundsContainer container) {
+    public static int getRowSize(SoundsContainer container) {
         int size = 1;
 
         if (container.list.size() <= 18) size += 2;
@@ -41,17 +44,17 @@ public class SoundViewerMenu extends MenuBase {
         return Math.min(size, 6);
     }
 
-    public static String getTitle(SoundBreakdown.SoundsContainer container) {
+    public static String getTitle(SoundsContainer container) {
         if (container.parent == null) return "Pick a sound category";
         else return container.name + " Sounds";
     }
 
-    public MenuItem getItemFor(SoundBreakdown.SoundWrapperBase soundWrapper) {
+    public MenuItem getItemFor(SoundWrapperBase soundWrapper) {
 
         MenuItem item = new SoundItem(soundWrapper);
 
-        if (soundWrapper instanceof SoundBreakdown.SoundWrapper) {
-            SoundBreakdown.SoundWrapper wrapper = (SoundBreakdown.SoundWrapper) soundWrapper;
+        if (soundWrapper instanceof SoundWrapper) {
+            SoundWrapper wrapper = (SoundWrapper) soundWrapper;
             item.addDescription(ChatColor.GRAY + "Set the VocalMimicry sound to " + wrapper.sound.name());
             item.addDescription("");
             item.addDescription(ChatColor.YELLOW + "Click to preview the sound.");
@@ -60,8 +63,8 @@ public class SoundViewerMenu extends MenuBase {
             } else {
                 item.addDescription(ChatColor.YELLOW + "Click again to set it.");
             }
-        } else if (soundWrapper instanceof SoundBreakdown.SoundsContainer) {
-            SoundBreakdown.SoundsContainer container = (SoundBreakdown.SoundsContainer) soundWrapper;
+        } else if (soundWrapper instanceof SoundsContainer) {
+            SoundsContainer container = (SoundsContainer) soundWrapper;
             item.addDescription(ChatColor.GRAY + "Click to open " + container.name);
         }
         item.setEnchanted(soundWrapper == selected);
@@ -88,7 +91,7 @@ public class SoundViewerMenu extends MenuBase {
             this.addMenuItem(item, startPoint + i);
         }*/
         for (int i = start; i < end; i++) {
-            SoundBreakdown.SoundWrapperBase soundWrapper = this.open.list.get(i);
+            SoundWrapperBase soundWrapper = this.open.list.get(i);
             MenuItem item = getItemFor(soundWrapper);
             this.addMenuItem(item, startPoint + (i % 45));
         }
@@ -154,9 +157,9 @@ public class SoundViewerMenu extends MenuBase {
 
     public class SoundItem extends MenuItem {
 
-        private SoundBreakdown.SoundWrapperBase base;
+        private SoundWrapperBase base;
 
-        public SoundItem(SoundBreakdown.SoundWrapperBase soundWrapper) {
+        public SoundItem(SoundWrapperBase soundWrapper) {
             super(ChatColor.YELLOW + soundWrapper.name, soundWrapper.stack);
 
             this.base = soundWrapper;
@@ -164,20 +167,20 @@ public class SoundViewerMenu extends MenuBase {
 
         @Override
         public void onClick(Player player) {
-            if (this.base instanceof SoundBreakdown.SoundWrapper) {
+            if (this.base instanceof SoundWrapper) {
                 if (selected == this.base) {
-                    VocalMimicryMenu.setVocalSound(player, ((SoundBreakdown.SoundWrapper) this.base).sound);
+                    VocalMimicryMenu.setVocalSound(player, ((SoundWrapper) this.base).sound);
                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-                    player.sendMessage(ChatColor.GREEN + "VocalMimicry sound set to " + ((SoundBreakdown.SoundWrapper) this.base).sound.name());
+                    player.sendMessage(ChatColor.GREEN + "VocalMimicry sound set to " + ((SoundWrapper) this.base).sound.name());
                     selected = null;
                 } else {
                     if (selected != null) player.stopSound(selected.sound);
-                    selected = (SoundBreakdown.SoundWrapper) this.base;
-                    player.playSound(player.getLocation(), ((SoundBreakdown.SoundWrapper) this.base).sound, SoundCategory.MASTER,1, 1);
+                    selected = (SoundWrapper) this.base;
+                    player.playSound(player.getLocation(), ((SoundWrapper) this.base).sound, SoundCategory.MASTER,1, 1);
                 }
                 instance.update();
             } else {
-                SoundViewerMenu menu = new SoundViewerMenu((SoundBreakdown.SoundsContainer) this.base);
+                SoundViewerMenu menu = new SoundViewerMenu((SoundsContainer) this.base);
                 menu.openMenu(player);
                 menu.selected = selected;
                 menu.prev = instance;

@@ -1,10 +1,12 @@
 package com.strangeone101.vocalmimicrygui.vocalmimicrymenu;
 
+import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapper;
+import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapperBase;
+import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundsContainer;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -570,57 +571,6 @@ public class SoundBreakdown {
         public Material getMaterial() {
             return material;
         }
-    }
-
-    public class SoundWrapper extends SoundWrapperBase {
-
-        public Sound sound;
-
-        public SoundWrapper(String path, Sound sound, ItemStack stack, String name) {
-            this.path = path;
-            this.stack = stack;
-            this.name = name;
-            this.sound = sound;
-        }
-
-        public void addToContainer(SoundsContainer container) {
-            container.list.add(this);
-            this.parent = container;
-        }
-
-        public void register() {
-            SOUND_ENTRIES.put(this.path, this);
-        }
-
-        @Override
-        public String toString() {
-            return path;
-        }
-    }
-
-    public class SoundsContainer extends SoundWrapperBase {
-
-        public List<SoundWrapperBase> list;
-
-        public SoundsContainer(String path, ItemStack stack, String name) {
-            this.path = path;
-            this.stack = stack;
-            this.name = name;
-            this.list = new ArrayList<>();
-        }
-
-        @Override
-        public String toString() {
-            return path + list.toString();
-        }
-    }
-
-    public class SoundWrapperBase {
-
-        public String path;
-        public ItemStack stack;
-        public String name;
-        public SoundsContainer parent;
     }
 
     public static SoundBreakdown getInstance() {
