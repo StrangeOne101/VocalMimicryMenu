@@ -97,13 +97,14 @@ public class Listener implements org.bukkit.event.Listener {
 
 							TextComponent full2 = new TextComponent(" to open the VocalMimicry menu! Or run the command ");
 							full2.setColor(ChatColor.YELLOW);
+							full2.setBold(false);
 
 							TextComponent full3 = new TextComponent("/vocalmenu");
-							full2.setColor(ChatColor.GOLD);
+							full3.setColor(ChatColor.RED);
 
 							full2.addExtra(full3);
 							here.addExtra(full2);
-							full.addExtra(full);
+							full.addExtra(here);
 
 							player.spigot().sendMessage(full);
 

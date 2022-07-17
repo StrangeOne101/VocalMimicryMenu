@@ -356,7 +356,7 @@ public class SoundBreakdown {
             if (BLOCK_TEXTURES.containsKey(materialName)) materialName = BLOCK_TEXTURES.get(materialName);
 
             Material mat = Material.getMaterial(materialName);
-            if (mat == null) {
+            if (mat == null || !mat.isItem()) { //If it isn't an item, it can't be viewed in the inventory
                 mat = Material.BEDROCK;
             }
             container = new SoundsContainer("blocks." + blockName.toLowerCase(), new ItemStack(mat), getFancyName(blockName));
@@ -441,7 +441,9 @@ public class SoundBreakdown {
                 case "AMBIENT": mat = Material.FEATHER; break;
                 case "SQUIRT":
                 case "AMBIENT_WATER": mat = Material.INK_SAC; break;
-                case "ATTACK": mat = Material.IRON_SWORD; break;
+                case "ATTACK":
+                case "ATTACK_SWEEP":
+                    mat = Material.IRON_SWORD; break;
                 case "ANGRY": mat = Material.GOLD_NUGGET; break;
                 case "HURT": mat = Material.REDSTONE; break;
                 case "DEATH_SMALL":
@@ -449,6 +451,10 @@ public class SoundBreakdown {
                 case "DEATH": mat = Material.WITHER_SKELETON_SKULL; break;
                 case "EAT": mat = Material.CARROT; break;
                 case "STEP": mat = Material.GOLDEN_BOOTS; break;
+                case "BIG_FALL": mat = Material.DIAMOND_BOOTS; break;
+                case "SMALL_FALL": mat = Material.LEATHER_BOOTS; break;
+                case "THROW": mat = Material.SNOWBALL; break;
+                case "CHARGE": mat = Material.IRON_AXE; break;
                 case "SADDLE": mat = Material.SADDLE; break;
                 case "BREATH": mat = Material.TURTLE_HELMET; break;
                 case "SWIM":
@@ -463,6 +469,11 @@ public class SoundBreakdown {
                 case "RETREAT": mat = Material.SHIELD; break;
                 case "FLOP": mat = Material.COD; break;
                 case "AMBIENT_LAND": mat = Material.SAND; break;
+                case "EXPLODE": mat = Material.TNT; break;
+                case "DRINK":
+                case "PANT":
+                case "BURP":
+                    mat = Material.POTION; break;
                 case "HATCH":
                 case "EGG_CRACK":
                 case "EGG":
@@ -475,7 +486,6 @@ public class SoundBreakdown {
                 case "GROWL": mat = Material.PORKCHOP; break;
                 case "HOWL": mat = Material.WHITE_WOOL; break;
                 case "WHINE": mat = Material.BONE; break;
-                case "PANT": mat = Material.POTION; break;
                 case "SPAWN": mat = Material.OBSIDIAN; break;
                 case "ATTACK_IRON_DOOR": mat = Material.IRON_DOOR; break;
                 case "ATTACK_WOODEN_DOOR":
@@ -488,7 +498,23 @@ public class SoundBreakdown {
                 case "CURE": mat = Material.GLISTERING_MELON_SLICE; break;
                 case "MILK": mat = Material.MILK_BUCKET; break;
                 case "PRIMED": mat = Material.FLINT_AND_STEEL; break;
+                case "SHEAR":
                 case "CONVERT": mat = Material.SHEARS; break;
+                case "ATTACK_KNOCKBACK": mat = Material.STICK; break;
+                case "ATTACK_WEAK": mat = Material.WOODEN_SWORD; break;
+                case "ATTACK_STRONG": mat = Material.DIAMOND_SWORD; break;
+                case "ATTACK_NODAMAGE": mat = Material.IRON_HELMET; break;
+                case "ATTACK_CRIT": mat = Material.GOLDEN_SWORD; break;
+                case "LEVELUP": mat = Material.LAPIS_LAZULI; break;
+            }
+        } else if (category == Category.ITEMS) {
+            switch(soundExtension.toUpperCase()) {
+                case "USE": mat = Material.BONE_MEAL; break;
+                case "BREAK": mat = Material.IRON_AXE; break;
+                case "EMPTY_WATER":
+                case "FILL_WATER": mat = Material.WATER_BUCKET; break;
+                case "EMPTY_LAVA":
+                case "FILL_LAVA": mat = Material.LAVA_BUCKET; break;
             }
         }
 
