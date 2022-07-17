@@ -9,5 +9,5 @@ commands:
   vocalmenu:
     description: Open the VocalMimicryMenu
     aliases: [vcl, vocamimi, vocalmimicrymenu]
-permissions:
+    permission: bending.command.vocalmenu
 
