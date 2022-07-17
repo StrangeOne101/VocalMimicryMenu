@@ -1,14 +1,12 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources;
+package com.strangeone101.vocalmimicrymenu.resources;
 
 
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.command.PKCommand;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.VocalMimicryMenu;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.menu.SoundViewerMenu;
+import com.strangeone101.vocalmimicrymenu.VocalMimicryMenu;
+import com.strangeone101.vocalmimicrymenu.menu.SoundViewerMenu;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -21,8 +19,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
-
-import java.util.Arrays;
 
 public class Listener implements org.bukkit.event.Listener {
 

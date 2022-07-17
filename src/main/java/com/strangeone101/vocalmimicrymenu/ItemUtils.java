@@ -1,4 +1,4 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu;
+package com.strangeone101.vocalmimicrymenu;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;

@@ -1,12 +1,12 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.menu;
+package com.strangeone101.vocalmimicrymenu.menu;
 
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.SoundBreakdown;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.VocalMimicryMenu;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources.MenuBase;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources.MenuItem;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapper;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapperBase;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundsContainer;
+import com.strangeone101.vocalmimicrymenu.SoundBreakdown;
+import com.strangeone101.vocalmimicrymenu.VocalMimicryMenu;
+import com.strangeone101.vocalmimicrymenu.resources.MenuBase;
+import com.strangeone101.vocalmimicrymenu.resources.MenuItem;
+import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapper;
+import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapperBase;
+import com.strangeone101.vocalmimicrymenu.wrapper.SoundsContainer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;

@@ -1,12 +1,11 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources;
+package com.strangeone101.vocalmimicrymenu.resources;
 
 import java.util.HashMap;
 
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.VocalMimicryMenu;
+import com.strangeone101.vocalmimicrymenu.VocalMimicryMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;

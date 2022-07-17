@@ -1,7 +1,7 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu;
+package com.strangeone101.vocalmimicrymenu;
 
 import com.projectkorra.projectkorra.command.PKCommand;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.menu.SoundViewerMenu;
+import com.strangeone101.vocalmimicrymenu.menu.SoundViewerMenu;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

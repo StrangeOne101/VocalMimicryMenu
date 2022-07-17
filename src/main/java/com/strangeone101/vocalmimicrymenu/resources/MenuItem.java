@@ -1,4 +1,4 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources;
+package com.strangeone101.vocalmimicrymenu.resources;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 public abstract class MenuItem{
 

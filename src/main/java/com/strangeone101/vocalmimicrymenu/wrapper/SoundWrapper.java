@@ -1,6 +1,6 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper;
+package com.strangeone101.vocalmimicrymenu.wrapper;
 
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.SoundBreakdown;
+import com.strangeone101.vocalmimicrymenu.SoundBreakdown;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 

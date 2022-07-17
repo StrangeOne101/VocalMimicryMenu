@@ -1,6 +1,6 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu;
+package com.strangeone101.vocalmimicrymenu;
 
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources.Listener;
+import com.strangeone101.vocalmimicrymenu.resources.Listener;
 import me.simplicitee.project.addons.ability.air.VocalMimicry;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;

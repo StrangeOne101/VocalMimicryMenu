@@ -1,8 +1,8 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu;
+package com.strangeone101.vocalmimicrymenu;
 
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapper;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundWrapperBase;
-import com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper.SoundsContainer;
+import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapper;
+import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapperBase;
+import com.strangeone101.vocalmimicrymenu.wrapper.SoundsContainer;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

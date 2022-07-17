@@ -1,4 +1,4 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.resources;
+package com.strangeone101.vocalmimicrymenu.resources;
 
 import org.bukkit.entity.Player;
 

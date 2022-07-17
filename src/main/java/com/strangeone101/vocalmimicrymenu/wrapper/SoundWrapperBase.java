@@ -1,4 +1,4 @@
-package com.strangeone101.vocalmimicrygui.vocalmimicrymenu.wrapper;
+package com.strangeone101.vocalmimicrymenu.wrapper;
 
 import org.bukkit.inventory.ItemStack;
 
