@@ -1,0 +1,13 @@
+name: VocalMimicryMenu
+version: '${project.version}'
+main: com.strangeone101.vocalmimicrygui.vocalmimicrymenu.VocalMimicryMenu
+api-version: 1.15
+depend: [ ProjectKorra ]
+authors: [ StrangeOne101, ProjectAddons]
+description: An interactive menu to change the sound used in VocalMimicry
+commands:
+  vocalmenu:
+    description: Open the VocalMimicryMenu
+    aliases: [vcl, vocamimi, vocalmimicrymenu]
+permissions:
+
