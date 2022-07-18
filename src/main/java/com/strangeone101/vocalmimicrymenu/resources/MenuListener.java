@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 
-public class Listener implements org.bukkit.event.Listener {
+public class MenuListener implements org.bukkit.event.Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void onMenuItemClicked(InventoryClickEvent event) {
@@ -62,52 +62,4 @@ public class Listener implements org.bukkit.event.Listener {
 			e.printStackTrace();
 		}
     }
-
-	@EventHandler
-	public void playerLeave(PlayerQuitEvent event) {
-		SoundViewerMenu.releaseMemory(event.getPlayer());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onCommand(PlayerCommandPreprocessEvent event) {
-		final String[] splits = event.getMessage().toLowerCase().split(" ");
-		if (splits.length != 3) return;
-		final Player player = event.getPlayer();
-		Bukkit.getScheduler().runTaskLater(VocalMimicryMenu.INSTANCE, () -> {
-			for (String s : Commands.commandaliases) {
-				if (splits[0].equals("/" + s)) {
-					for (String s1 : PKCommand.instances.get("help").getAliases()) {
-						if (splits[1].equals(s1) && splits[2].equalsIgnoreCase("VocalMimicry")) {
-							String string = ChatColor.YELLOW + "Want to set the sound of VocalMimicry easily?";
-							player.sendMessage(string);
-
-							TextComponent here = new TextComponent("here");
-							here.setColor(ChatColor.GREEN);
-							here.setBold(true);
-							here.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.YELLOW + "Open the VocalMimicry menu!\n\n"
-									+ ChatColor.YELLOW + "Run Command: " + ChatColor.GRAY + "/vocalmenu")));
-							here.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/vocalmenu"));
-
-							TextComponent full = new TextComponent("Click ");
-							full.setColor(ChatColor.YELLOW);
-
-							TextComponent full2 = new TextComponent(" to open the VocalMimicry menu! Or run the command ");
-							full2.setColor(ChatColor.YELLOW);
-							full2.setBold(false);
-
-							TextComponent full3 = new TextComponent("/vocalmenu");
-							full3.setColor(ChatColor.RED);
-
-							full2.addExtra(full3);
-							here.addExtra(full2);
-							full.addExtra(here);
-
-							player.spigot().sendMessage(full);
-
-						}
-					}
-				}
-			}
-		}, 1L);
-	}
 }

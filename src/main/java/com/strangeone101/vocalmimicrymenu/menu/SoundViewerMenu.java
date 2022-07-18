@@ -7,6 +7,7 @@ import com.strangeone101.vocalmimicrymenu.resources.MenuItem;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapper;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapperBase;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundsContainer;
+import me.simplicitee.project.addons.ability.air.VocalMimicry;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,12 +20,15 @@ import java.util.Map;
 public class SoundViewerMenu extends MenuBase {
 
     private static Map<Player, SoundViewerMenu> LAST_OPEN = new HashMap<>();
+    private static Map<Player, Sound> SET = new HashMap<>();
+
 
     private SoundWrapper selected;
     private SoundsContainer open;
     private int page;
     private SoundViewerMenu prev;
     private final SoundViewerMenu instance = this;
+    private Player player;
 
     public SoundViewerMenu(SoundsContainer soundsContainer) {
         super(getTitle(soundsContainer), getRowSize(soundsContainer));
@@ -50,8 +54,8 @@ public class SoundViewerMenu extends MenuBase {
     }
 
     public MenuItem getItemFor(SoundWrapperBase soundWrapper) {
-
         MenuItem item = new SoundItem(soundWrapper);
+        boolean set = SET.containsKey(player) && soundWrapper instanceof SoundWrapper && SET.get(player).equals(((SoundWrapper) soundWrapper).sound);
 
         if (soundWrapper instanceof SoundWrapper) {
             SoundWrapper wrapper = (SoundWrapper) soundWrapper;
@@ -63,9 +67,18 @@ public class SoundViewerMenu extends MenuBase {
             } else {
                 item.addDescription(ChatColor.YELLOW + "Click again to set it.");
             }
+
+            if (set) {
+                item.addDescription("");
+                item.addDescription(ChatColor.GREEN + ChatColor.BOLD.toString() + "Currently set as active sound!");
+            }
         } else if (soundWrapper instanceof SoundsContainer) {
             SoundsContainer container = (SoundsContainer) soundWrapper;
-            item.addDescription(ChatColor.GRAY + "Click to open " + container.name);
+            String name = container.name.toLowerCase();
+            if (name.endsWith("s")) name = name.substring(0, name.length() - 1);
+            if (container.path.contains(".")) name = name + " sounds";
+            else name = "the " + name;
+            item.addDescription(ChatColor.GRAY + "Click to open " + name);
         }
         item.setEnchanted(soundWrapper == selected);
         return item;
@@ -83,13 +96,9 @@ public class SoundViewerMenu extends MenuBase {
         else if (size == 4 || size == 5) startPoint = 11;
         else if (size == 6 || size == 7) startPoint = 10;
 
-        int start = 45 * page;
-        int end = Math.min(45 * (page + 1), size);
-        /*for (int i = 0; i < this.open.list.size(); i++) {
-            SoundBreakdown.SoundWrapperBase soundWrapper = this.open.list.get(i);
-            MenuItem item = getItemFor(soundWrapper);
-            this.addMenuItem(item, startPoint + i);
-        }*/
+        int start = 45 * page; //The start index
+        int end = Math.min(45 * (page + 1), size); //The finish index
+
         for (int i = start; i < end; i++) {
             SoundWrapperBase soundWrapper = this.open.list.get(i);
             MenuItem item = getItemFor(soundWrapper);
@@ -150,6 +159,7 @@ public class SoundViewerMenu extends MenuBase {
     @Override
     public void openMenu(Player player) {
         super.openMenu(player);
+        this.player = player;
         update();
 
         LAST_OPEN.put(player, this);
@@ -169,9 +179,14 @@ public class SoundViewerMenu extends MenuBase {
         public void onClick(Player player) {
             if (this.base instanceof SoundWrapper) {
                 if (selected == this.base) {
-                    VocalMimicryMenu.setVocalSound(player, ((SoundWrapper) this.base).sound);
-                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-                    player.sendMessage(ChatColor.GREEN + "VocalMimicry sound set to " + ((SoundWrapper) this.base).sound.name());
+                    if (VocalMimicryMenu.setVocalSound(player, ((SoundWrapper) this.base).sound)) {
+                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
+                        player.sendMessage(ChatColor.GREEN + "VocalMimicry sound set to " + ((SoundWrapper) this.base).sound.name());
+                        SET.put(player, ((SoundWrapper) this.base).sound);
+                    } else {
+                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_FALL, 1, 0.6F);
+                        player.sendMessage(ChatColor.RED + "You are not allowed to use the sound " + ((SoundWrapper) this.base).sound.name() + "!");
+                    }
                     selected = null;
                 } else {
                     if (selected != null) player.stopSound(selected.sound);
@@ -200,5 +215,6 @@ public class SoundViewerMenu extends MenuBase {
 
     public static void releaseMemory(Player player) {
         LAST_OPEN.remove(player);
+        SET.remove(player);
     }
 }

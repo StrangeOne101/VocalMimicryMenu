@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class SoundBreakdown {
 
-    private static SoundBreakdown INSTANCE;
+    static SoundBreakdown INSTANCE;
 
     public SoundBreakdown() {
         if (INSTANCE == null) {
@@ -152,21 +152,11 @@ public class SoundBreakdown {
         OTHER_MOB_TEXTURES.put("lightning_bolt", "END_ROD");
         OTHER_MOB_TEXTURES.put("lingering_potion", "DRAGON_BREATH");
         OTHER_MOB_TEXTURES.put("firework_rocket", "FIREWORK_ROCKET");
-        OTHER_MOB_TEXTURES.put("fishing_bobber", "FISHING_ROG");
+        OTHER_MOB_TEXTURES.put("fishing_bobber", "FISHING_ROD");
 
         ALL_MOB_TEXTURES.putAll(PASSIVE_MOB_TEXTURES);
         ALL_MOB_TEXTURES.putAll(HOSTILE_MOB_TEXTURES);
         ALL_MOB_TEXTURES.putAll(OTHER_MOB_TEXTURES);
-
-        addManualSound("Experience Orb Pickup", "ENTITY_EXPERIENCE_ORB_PICKUP", "entity.experience_bottle");
-        addManualSound("Fish Swim", "ENTITY_FISH_SWIM", "entity.cod");
-        addManualSound("Fish Swim", "ENTITY_FISH_SWIM", "entity.salmon");
-        addManualSound("Fish Swim", "ENTITY_FISH_SWIM", "entity.pufferfish");
-        addManualSound("Fish Swim", "ENTITY_FISH_SWIM", "entity.tropical_fish");
-        addManualSound("Raid Horn", "EVENT_RAID_HORN", "entity.pillager");
-        addManualSound("Raid Horn", "EVENT_RAID_HORN", "entity.ravager");
-        addManualSound("Raid Horn", "EVENT_RAID_HORN", "entity.evoker");
-        addManualSound("Raid Horn", "EVENT_RAID_HORN", "entity.vindicator");
 
         ITEM_TEXTURES.put("AXE", "IRON_AXE");
         ITEM_TEXTURES.put("BOTTLE", "GLASS_BOTTLE");
@@ -232,6 +222,8 @@ public class SoundBreakdown {
 
         soundloop:
         for (Sound sound : Sound.values()) {
+            if (VocalMimicryMenu.isBlacklisted(sound)) continue;
+
             String asString = sound.name().toLowerCase();
             if (asString.startsWith("entity")) {
                 asString = asString.substring("entity_".length());
@@ -336,6 +328,8 @@ public class SoundBreakdown {
                 else if (asString.equals("creative")) material = Material.YELLOW_TERRACOTTA;
                 else if (asString.equals("dragon")) material = Material.OBSIDIAN;
                 else if (asString.equals("menu")) material = Material.OAK_SIGN;
+                else if (asString.equals("credits")) material = Material.ENDER_EYE;
+                else if (asString.equals("game")) material = Material.DIAMOND;
 
                 SoundWrapper wrapper = new SoundWrapper("music." + asString, sound, new ItemStack(material), getFancyName(asString));
                 SoundsContainer container = (SoundsContainer) SOUND_ENTRIES.get("music");
@@ -413,63 +407,184 @@ public class SoundBreakdown {
         return (SoundsContainer) container;
     }
 
-    private void addSound(SoundWrapper wrapper) {
-        //TODO
-    }
-
     public ItemStack getSoundItemStack(Category category, String type, String soundExtension) {
         if (type.equalsIgnoreCase("parrot") && soundExtension.toLowerCase().startsWith("imitate")) {
             String imitateEntity = soundExtension.substring("imitate_".length());
             if (ALL_MOB_TEXTURES.containsKey(imitateEntity)) {
                 return ItemUtils.getFromString(ALL_MOB_TEXTURES.get(imitateEntity));
             }
+        } else if (type.equals("note_block") && category == Category.BLOCKS) {
+            switch (soundExtension.toUpperCase()) {
+                case "BASS": return new ItemStack(Material.OAK_PLANKS);
+                case "SNARE": return new ItemStack(Material.SAND);
+                case "HAT": return new ItemStack(Material.GLASS);
+                case "BASEDRUM": return new ItemStack(Material.STONE);
+                case "BELL": return new ItemStack(Material.GOLD_BLOCK);
+                case "FLUTE": return new ItemStack(Material.CLAY);
+                case "CHIME": return new ItemStack(Material.PACKED_ICE);
+                case "GUITAR": return new ItemStack(Material.RED_WOOL);
+                case "XYLOPHONE": return new ItemStack(Material.BONE_BLOCK);
+                case "IRON_XYLOPHONE": return new ItemStack(Material.IRON_BLOCK);
+                case "COW_BELL": return new ItemStack(Material.SOUL_SAND);
+                case "DIDGERIDOO": return new ItemStack(Material.PUMPKIN);
+                case "BIT": return new ItemStack(Material.EMERALD_BLOCK);
+                case "BANJO": return new ItemStack(Material.HAY_BLOCK);
+                case "PLING": return new ItemStack(Material.GLOWSTONE);
+                case "HARP": return new ItemStack(Material.GRASS_BLOCK);
+            }
+        } else if (category == Category.BLOCKS) {
+            switch (type.toUpperCase()) { //Cases where they only have a few sounds, so use the block as the icon
+                case "END_PORTAL":
+                case "END_PORTAL_FRAME":
+                case "END_GATEWAY":
+                case "CAMPFIRE":
+                case "FURNACE":
+                case "GRINDSTONE":
+                case "SMITHING_TABLE":
+                case "PISTON": {
+                    if (BLOCK_TEXTURES.containsKey(type.toUpperCase())) return ItemUtils.getFromString(BLOCK_TEXTURES.get(type.toUpperCase()));
+                    return ItemUtils.getFromString(type.toUpperCase());
+                }
+            }
+            if (soundExtension.equalsIgnoreCase("use")) {
+                if (BLOCK_TEXTURES.containsKey(type.toUpperCase()))
+                    return ItemUtils.getFromString(BLOCK_TEXTURES.get(type.toUpperCase()));
+                return ItemUtils.getFromString(type.toUpperCase());
+            }
+        } else if (category == Category.ITEMS) {
+            if (soundExtension.equalsIgnoreCase("use")) {
+                if (ITEM_TEXTURES.containsKey(type.toUpperCase())) return ItemUtils.getFromString(ITEM_TEXTURES.get(type.toUpperCase()));
+                return ItemUtils.getFromString(type.toUpperCase());
+            } else if (type.equalsIgnoreCase("armor_equip")) {
+                switch (soundExtension.toUpperCase()) {
+                    case "LEATHER": return new ItemStack(Material.LEATHER_CHESTPLATE);
+                    case "CHAINMAIL": return new ItemStack(Material.CHAINMAIL_CHESTPLATE);
+                    case "GENERIC":
+                    case "IRON": return new ItemStack(Material.IRON_CHESTPLATE);
+                    case "DIAMOND": return new ItemStack(Material.DIAMOND_CHESTPLATE);
+                    case "GOLD": return new ItemStack(Material.GOLDEN_CHESTPLATE);
+                    case "ELYTRA": return new ItemStack(Material.ELYTRA);
+                    case "NETHERITE": return new ItemStack(Material.getMaterial("NETHERITE_CHESTPLATE"));
+                    case "TURTLE": return new ItemStack(Material.TURTLE_HELMET);
+                }
+            } else if (type.equalsIgnoreCase("bucket")) {
+                if (soundExtension.toLowerCase().startsWith("empty")) return new ItemStack(Material.BUCKET);
+                switch (soundExtension.toUpperCase()) {
+                    case "FILL":
+                    case "FILL_WATER": return new ItemStack(Material.WATER_BUCKET);
+                    case "FILL_LAVA": return new ItemStack(Material.LAVA_BUCKET);
+                    case "FILL_POWDER_SNOW": return new ItemStack(Material.getMaterial("POWDER_SNOW_BUCKET"));
+                    case "FILL_FISH": return new ItemStack(Material.getMaterial("SALMON_BUCKET"));
+                    case "FILL_AXOLOTL": return new ItemStack(Material.getMaterial("AXOLOTL_BUCKET"));
+                }
+            }
+
         }
 
         Material mat = Material.PAPER;
         if (category == Category.BLOCKS) {
             switch(soundExtension.toUpperCase()) {
                 case "BREAK": mat = Material.COBBLESTONE; break;
-                case "PLACE": mat = Material.OAK_LOG; break;
-                case "HIT": mat = Material.STONE; break;
-                case "STEP": mat = Material.DIRT; break;
-                case "FALL": mat = Material.SAND; break;
+                case "PLACE": mat = Material.BLUE_TERRACOTTA; break;
+                case "HIT": mat = Material.OAK_LOG; break;
+                case "LAND":
+                case "STEP": mat = Material.GRASS_BLOCK; break;
+                case "FALL": mat = Material.HAY_BLOCK; break;
                 case "AMBIENT": mat = Material.RED_STAINED_GLASS; break;
+                case "AMBIENT_SHORT": mat = Material.PINK_STAINED_GLASS; break;
                 case "EXTINGUISH": mat = Material.GRAY_CONCRETE; break;
+                case "PICK_BERRIES": mat = Material.getMaterial("GLOW_BERRIES"); break;
+                case "SHEAR":
+                case "CARVE":
+                case "CONVERT": mat = Material.SHEARS; break;
+                case "CLICK_ON":
+                case "DOOR_OPEN":
+                case "OPEN":
+                case "ACTIVATE":
+                case "TRAPDOOR_OPEN": mat = Material.LIME_TERRACOTTA; break;
+                case "CLICK_OFF":
+                case "DOOR_CLOSE":
+                case "CLOSE":
+                case "DEACTIVATE":
+                case "TRAPDOOR_CLOSE": mat = Material.RED_TERRACOTTA; break;
+                case "ATTACH": mat = Material.TRIPWIRE_HOOK; break;
+                case "DESTROY":
+                case "DETACH": mat = Material.IRON_PICKAXE; break;
+                case "CHARGE": mat = Material.FIRE_CHARGE; break;
+                case "POP":
+                case "LAVA":
+                case "DRIP_LAVA": mat = Material.LAVA_BUCKET; break;
+                case "CLICK": mat = Material.LEVER; break;
+                case "BURNOUT": mat = Material.BLACK_CONCRETE; break;
+                case "DRIP_WATER":
+                case "WATER": mat = Material.WATER_BUCKET; break;
+                case "DRIP_LAVA_INTO_CAULDRON":
+                case "DRIP_WATER_INTO_CAULDRON": mat = Material.CAULDRON; break;
+                case "SLIDE": mat = Material.HONEY_BLOCK; break;
+                case "LOCKED": mat = Material.IRON_INGOT; break;
+                case "CHIME": mat = Material.GOLD_BLOCK; break;
+                case "RESONATE": mat = Material.BELL; break;
+                case "ADD_CANDLE": mat = Material.getMaterial("CANDLE"); break;
+                case "POWER_SELECT": mat = Material.EMERALD; break;
+                case "ATTACK":
+                case "ATTACK_SHORT": mat = Material.IRON_SWORD; break;
+            }
+            if (mat == Material.PAPER) {
+                if (BLOCK_TEXTURES.containsKey(type.toUpperCase())) return ItemUtils.getFromString(BLOCK_TEXTURES.get(type));
+                return ItemUtils.getFromString(type.toUpperCase());
             }
         } else if (category == Category.MOBS) {
             switch(soundExtension.toUpperCase()) {
                 case "FLAP":
+                case "AMBIENT_BABY":
                 case "AMBIENT": mat = Material.FEATHER; break;
                 case "SQUIRT":
-                case "AMBIENT_WATER": mat = Material.INK_SAC; break;
+                case "AMBIENT_WATER":
+                case "CURSE":
+                    mat = Material.INK_SAC; break;
                 case "ATTACK":
                 case "ATTACK_SWEEP":
                     mat = Material.IRON_SWORD; break;
                 case "ANGRY": mat = Material.GOLD_NUGGET; break;
+                case "HIT":
+                case "HURT_LAND":
+                case "HURT_BABY":
                 case "HURT": mat = Material.REDSTONE; break;
                 case "DEATH_SMALL":
                 case "DEATH_BABY":
+                case "DEATH_LAND":
                 case "DEATH": mat = Material.WITHER_SKELETON_SKULL; break;
                 case "EAT": mat = Material.CARROT; break;
+                case "STEP_LAVA": mat = Material.LAVA_BUCKET; break;
                 case "STEP": mat = Material.GOLDEN_BOOTS; break;
                 case "BIG_FALL": mat = Material.DIAMOND_BOOTS; break;
+                case "FALL": mat = Material.IRON_BOOTS; break;
                 case "SMALL_FALL": mat = Material.LEATHER_BOOTS; break;
+                case "WARNING": mat = Material.ORANGE_DYE; break;
                 case "THROW": mat = Material.SNOWBALL; break;
                 case "CHARGE": mat = Material.IRON_AXE; break;
                 case "SADDLE": mat = Material.SADDLE; break;
                 case "BREATH": mat = Material.TURTLE_HELMET; break;
                 case "SWIM":
-                case "SPLASH": mat = Material.WATER_BUCKET; break;
+                case "SPLASH":
+                case "HURT_DROWN":
+                    mat = Material.WATER_BUCKET; break;
                 case "TRADE": mat = Material.EMERALD; break;
                 case "JUMP": mat = Material.RABBIT_FOOT; break;
                 case "CELEBRATE": mat = Material.FIREWORK_ROCKET; break;
                 case "SHOOT": mat = Material.ARROW; break;
                 case "HAPPY": mat = Material.COOKED_PORKCHOP; break;
-                case "YES": mat = Material.GREEN_WOOL; break;
+                case "YES": mat = Material.LIME_WOOL; break;
                 case "NO": mat = Material.RED_WOOL; break;
                 case "RETREAT": mat = Material.SHIELD; break;
                 case "FLOP": mat = Material.COD; break;
                 case "AMBIENT_LAND": mat = Material.SAND; break;
+                case "WORRIED_AMBIENT": mat = Material.LIGHT_BLUE_STAINED_GLASS; break;
+                case "AGGRESSIVE_AMBIENT": mat = Material.RED_STAINED_GLASS; break;
+                case "BITE":
+                case "WHINE":
+                    mat = Material.BONE; break;
+                case "CANT_BREED": mat = Material.WITHER_ROSE; break;
                 case "EXPLODE": mat = Material.TNT; break;
                 case "DRINK":
                 case "PANT":
@@ -480,13 +595,15 @@ public class SoundBreakdown {
                 case "EGG":
                 case "EGG_BREAK":
                 case "DESTROY_EGG":
+                case "LAY_EGG":
                 case "EGG_HATCH": mat = Material.EGG; break;
+                case "SHAMBLE_BABY":
                 case "SHAMBLE": mat = Material.SCUTE; break;
                 case "DIG": mat = Material.COARSE_DIRT; break;
                 case "BREAK_BLOCK": mat = Material.IRON_PICKAXE; break;
                 case "GROWL": mat = Material.PORKCHOP; break;
                 case "HOWL": mat = Material.WHITE_WOOL; break;
-                case "WHINE": mat = Material.BONE; break;
+                case "SHAKE": mat = Material.STRING; break;
                 case "SPAWN": mat = Material.OBSIDIAN; break;
                 case "ATTACK_IRON_DOOR": mat = Material.IRON_DOOR; break;
                 case "ATTACK_WOODEN_DOOR":
@@ -506,24 +623,65 @@ public class SoundBreakdown {
                 case "ATTACK_STRONG": mat = Material.DIAMOND_SWORD; break;
                 case "ATTACK_NODAMAGE": mat = Material.IRON_HELMET; break;
                 case "ATTACK_CRIT": mat = Material.GOLDEN_SWORD; break;
-                case "LEVELUP": mat = Material.LAPIS_LAZULI; break;
+                case "LEVELUP": mat = Material.EXPERIENCE_BOTTLE; break;
+                case "RETRIEVE": mat = Material.FISHING_ROD; break;
+                case "BREAK": mat = Material.GUNPOWDER; break;
+                case "PLACE": mat = Material.SUGAR_CANE; break;
+                case "ADD_ITEM":
+                case "REMOVE_ITEM":
+                case "ROTATE_ITEM": mat = Material.ITEM_FRAME; break;
+                case "REPAIR": mat = Material.IRON_INGOT; break;
+                case "FLY": mat = Material.ELYTRA; break;
+                case "SPLASH_HIGH_SPEED": mat = Material.OAK_BOAT; break;
+                case "HURT_FREEZE": mat = Material.ICE; break;
+                case "HURT_ON_FIRE": mat = Material.FIRE_CHARGE; break;
+                case "HURT_SWEET_BERRY_BUSH": mat = Material.SWEET_BERRIES; break;
+                case "CHEST": mat = Material.CHEST; break;
+                case "SNEEZE":
+                case "PRE_SNEEZE": mat = Material.SLIME_BALL; break;
+                case "BLOW_UP":
+                case "BLOW_OUT": mat = Material.PUFFERFISH; break;
+                case "BURN": mat = Material.BLAZE_POWDER; break;
             }
         } else if (category == Category.ITEMS) {
             switch(soundExtension.toUpperCase()) {
-                case "USE": mat = Material.BONE_MEAL; break;
                 case "BREAK": mat = Material.IRON_AXE; break;
+                case "BLOCK": mat = Material.SHIELD; break;
                 case "EMPTY_WATER":
                 case "FILL_WATER": mat = Material.WATER_BUCKET; break;
                 case "EMPTY_LAVA":
                 case "FILL_LAVA": mat = Material.LAVA_BUCKET; break;
+                case "DRINK": mat = Material.POTION; break;
+                case "FLYING": mat = Material.ELYTRA; break;
+                case "TELEPORT": mat = Material.CHORUS_FRUIT; break;
+            }
+            if (mat == Material.PAPER) {
+                if (ITEM_TEXTURES.containsKey(type.toUpperCase())) return ItemUtils.getFromString(ITEM_TEXTURES.get(type));
+                return ItemUtils.getFromString(type.toUpperCase());
             }
         }
 
         return new ItemStack(mat);
     }
 
-    private void addManualSound(String name, String sound, String category) {
-        //TODO
+    private void addManualSound(String type, String sound, String category, ItemStack stack) {
+        Category cat = Category.valueOf(category.split("\\.")[0].toUpperCase());
+        try {
+            Sound soundEnum = Sound.valueOf(sound);
+            SoundWrapper wrapper = new SoundWrapper(category + "." + type, soundEnum, stack, getFancyName(type));
+            SoundWrapperBase parent = SOUND_ENTRIES.get(category);
+            if (parent instanceof SoundsContainer) {
+                wrapper.addToContainer((SoundsContainer) parent);
+                wrapper.register();
+            }
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+    }
+
+    private void addManualSound(String type, String sound, String category) {
+        Category cat = Category.valueOf(category.split("\\.")[0].toUpperCase());
+        this.addManualSound(type, sound, category, getSoundItemStack(cat, type, type));
     }
 
     public void fillSounds() {
@@ -536,10 +694,23 @@ public class SoundBreakdown {
 
         fillNonAutoTextures();
         fillAutoTextures();
+        fillFixes();
         ready = true;
 
         long end = System.currentTimeMillis();
         VocalMimicryMenu.INSTANCE.getLogger().info("Took " + (end - start) + "ms to fill sounds");
+    }
+
+    private void fillFixes() {
+        addManualSound("orb_pickup", "ENTITY_EXPERIENCE_ORB_PICKUP", "mobs.other.experience_bottle", new ItemStack(Material.EXPERIENCE_BOTTLE));
+        addManualSound("swim",  "ENTITY_FISH_SWIM", "mobs.passive.cod", new ItemStack(Material.COD));
+        addManualSound("swim", "ENTITY_FISH_SWIM", "mobs.passive.salmon", new ItemStack(Material.SALMON));
+        addManualSound("swim", "ENTITY_FISH_SWIM", "mobs.passive.pufferfish", new ItemStack(Material.PUFFERFISH));
+        addManualSound("swim", "ENTITY_FISH_SWIM", "mobs.passive.tropical_fish", new ItemStack(Material.TROPICAL_FISH));
+        addManualSound("raid_horn", "EVENT_RAID_HORN", "mobs.hostile.pillager", new ItemStack(Material.BLACK_BANNER));
+        addManualSound("raid_horn", "EVENT_RAID_HORN", "mobs.hostile.ravager", new ItemStack(Material.BLACK_BANNER));
+        addManualSound("raid_horn", "EVENT_RAID_HORN", "mobs.hostile.evoker", new ItemStack(Material.BLACK_BANNER));
+        addManualSound("raid_horn", "EVENT_RAID_HORN", "mobs.hostile.vindicator", new ItemStack(Material.BLACK_BANNER));
     }
 
     public String getFancyName(String thingName) {
