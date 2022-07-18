@@ -10,7 +10,12 @@ A menu for the VocalMimicry addon ([ProjectAddons](https://github.com/Simplicite
 # Usage
 Use the `/vocalmenu` command or `/b vocalmenu` to bring up the menu
 
-Click a sound to preview the sound, and click it again to set it as the sound to use
+Click a sound to preview the sound, and click it again to set it as the sound to use. Sounds can be favorited by right clicking them where they can be accessed easily in the favorites menu.
+
+# Permissions
+- `bending.command.vocalmenu` - Default. Allows the user to use the menu.
+- `bending.command.vocalmenu.favorites` - Default. Allows the user to favorite sounds.
+- `bending.command.vocalmenu.favorites.<number>` - Allows the user to favorite that number of sounds. Defaults to 5.
 
 # Images
 <p align="center"><img src="docs/VocalMenu_2.png"/></p>
