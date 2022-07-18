@@ -14,8 +14,8 @@ Click a sound to preview the sound, and click it again to set it as the sound to
 
 # Permissions
 - `bending.command.vocalmenu` - Default. Allows the user to use the menu.
-- `bending.command.vocalmenu.favorites` - Default. Allows the user to favorite sounds.
-- `bending.command.vocalmenu.favorites.<number>` - Allows the user to favorite that number of sounds. Defaults to 5.
+- `bending.command.vocalmenu.favorite` - Default. Allows the user to favorite sounds.
+- `bending.command.vocalmenu.favorite.<number>` - Allows the user to favorite that number of sounds. Defaults to 5.
 
 # Images
 <p align="center"><img src="docs/VocalMenu_2.png"/></p>
