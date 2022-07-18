@@ -42,6 +42,7 @@ public class MenuListener implements org.bukkit.event.Listener {
 	                    	if (item != null)
 	                    	{
 	                    		item.isShiftClicked = event.isShiftClick();
+								item.isRightClicked = event.isRightClick();
 	                    		item.onClick(player);
 	                    		event.setCancelled(true);
 	                    	}

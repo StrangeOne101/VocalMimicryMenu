@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 
 public class SoundViewerMenu extends MenuBase {
 
+    public static final char STAR = '\u2B50';
+
     private SoundWrapper selected;
     private SoundsContainer open;
     private int page;
@@ -50,6 +52,7 @@ public class SoundViewerMenu extends MenuBase {
     public MenuItem getItemFor(SoundWrapperBase soundWrapper) {
         MenuItem item = new SoundItem(soundWrapper);
         boolean set = cache.getSetSound() != null && soundWrapper instanceof SoundWrapper && cache.getSetSound() == (((SoundWrapper) soundWrapper).sound);
+        boolean fav = cache.isFavorite(soundWrapper);
 
         if (soundWrapper instanceof SoundWrapper) {
             SoundWrapper wrapper = (SoundWrapper) soundWrapper;
@@ -61,10 +64,14 @@ public class SoundViewerMenu extends MenuBase {
             } else {
                 item.addDescription(ChatColor.YELLOW + "Click again to set it.");
             }
+            if (cache.canFavorite() || fav) item.addDescription(ChatColor.YELLOW + "Right click to " + (fav ? "remove from" : "add to") + " your favorites.");
 
             if (set) {
                 item.addDescription("");
                 item.addDescription(ChatColor.GREEN + ChatColor.BOLD.toString() + "Currently set as active sound!");
+            } else if (fav) {
+                item.addDescription("");
+                item.addDescription(ChatColor.GOLD + ChatColor.BOLD.toString() + "Set as a favorite!");
             }
         } else if (soundWrapper instanceof SoundsContainer) {
             SoundsContainer container = (SoundsContainer) soundWrapper;
@@ -84,6 +91,7 @@ public class SoundViewerMenu extends MenuBase {
         int startPoint = 0;
 
         int size = this.open.list.size();
+        int maxPage = (this.open.list.size() - 1) / 45;
 
         if (size == 1) startPoint = 13;
         else if (size == 2 || size == 3) startPoint = 12;
@@ -105,8 +113,16 @@ public class SoundViewerMenu extends MenuBase {
             this.addMenuItem(getBack(), this.size - 9);
         }
 
-        if (this.open.list.size() > 45 && page < (this.open.list.size() - 1) / 45) {
+        if (this.open.list.size() > 45 && page < maxPage) {
             this.addMenuItem(getPage(false), this.size - 1);
+        }
+
+        //We check if the first item is a sound and not a container. Don't show while still in a category
+        //but the base categories are fine
+        if (cache.canFavorite() && (this.open.parent == null || this.open.list.get(0) instanceof SoundWrapper)) {
+            int favIndex = this.size - 1;
+            if (maxPage > 0) favIndex = this.size - 4;
+            this.addMenuItem(getFavoriteMenu(), favIndex);
         }
     }
 
@@ -119,8 +135,13 @@ public class SoundViewerMenu extends MenuBase {
         MenuItem item = new MenuItem(title, Material.ARROW, 1) {
             @Override
             public void onClick(Player player) {
-                if (left) page--;
-                else page++;
+                if (this.isShiftClicked) { //Go to last page on either side
+                    if (left) page = 0;
+                    else page = max - 1;
+                } else { //Just go one page
+                    if (left) page--;
+                    else page++;
+                }
 
                 update();
             }
@@ -150,6 +171,18 @@ public class SoundViewerMenu extends MenuBase {
         return item;
     }
 
+    public MenuItem getFavoriteMenu() {
+        MenuItem item = new MenuItem(ChatColor.YELLOW + "Favorites", Material.GOLD_INGOT, 1) {
+            @Override
+            public void onClick(Player player) {
+                FavoritesMenu menu = new FavoritesMenu(instance);
+                menu.openMenu(player);
+            }
+        };
+        item.addDescription(ChatColor.GRAY + "Click to open your favorites.");
+        return item;
+    }
+
     @Override
     public void openMenu(Player player) {
         super.openMenu(player);
@@ -165,7 +198,8 @@ public class SoundViewerMenu extends MenuBase {
         private SoundWrapperBase base;
 
         public SoundItem(SoundWrapperBase soundWrapper) {
-            super(ChatColor.YELLOW + soundWrapper.name, soundWrapper.stack);
+            super((cache.isFavorite(soundWrapper) ? ChatColor.GOLD : ChatColor.YELLOW) + soundWrapper.name +
+                    (cache.isFavorite(soundWrapper) ? " " + ChatColor.BOLD + STAR : ""), soundWrapper.stack);
 
             this.base = soundWrapper;
         }
@@ -173,23 +207,42 @@ public class SoundViewerMenu extends MenuBase {
         @Override
         public void onClick(Player player) {
             if (this.base instanceof SoundWrapper) {
-                if (selected == this.base) {
-                    if (VocalMimicryMenu.setVocalSound(player, ((SoundWrapper) this.base).sound)) {
-                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
+                if (this.isRightClicked) { //They are trying to favorite it
+                    boolean fav = cache.isFavorite(this.base);
+                    if (fav) { //Its already a favorite, so unfavorite it
+                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.MASTER, 1, 0.5F);
+                        cache.removeFavorite((SoundWrapper) this.base);
+                        player.sendMessage(ChatColor.YELLOW + "You unfavorited the sound " + ((SoundWrapper) this.base).sound.name() + ".");
+
+                    } else if (cache.canFavorite()) { //Only do this if they have permission to favorite
+                        if (cache.addFavorite((SoundWrapper) this.base)) {
+                            player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.MASTER, 1, 2F);
+                            player.sendMessage(ChatColor.GREEN + "Sound " + ((SoundWrapper) this.base).sound.name() + " added to favorites!");
+                        } else {
+                            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_FALL, 1, 0.6F);
+                            player.sendMessage(ChatColor.RED + "You can only add " + cache.getMaxFavorites() + " favorites!");
+                        }
+                    }
+                    instance.update();
+                    return;
+                }
+                if (selected == this.base) { //If the sound is selected
+                    if (VocalMimicryMenu.setVocalSound(player, ((SoundWrapper) this.base).sound)) { //Try set the sound
+                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.MASTER, 1, 2);
                         player.sendMessage(ChatColor.GREEN + "VocalMimicry sound set to " + ((SoundWrapper) this.base).sound.name());
                         cache.setSetSound(((SoundWrapper) this.base).sound);
-                    } else {
-                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_FALL, 1, 0.6F);
+                    } else { //It failed, usually because its blacklisted
+                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_FALL, SoundCategory.MASTER, 1, 0.6F);
                         player.sendMessage(ChatColor.RED + "You are not allowed to use the sound " + ((SoundWrapper) this.base).sound.name() + "!");
                     }
                     selected = null;
-                } else {
+                } else { //They are clicking this for the first time, so preview the sound
                     if (selected != null) player.stopSound(selected.sound);
                     selected = (SoundWrapper) this.base;
                     player.playSound(player.getLocation(), ((SoundWrapper) this.base).sound, SoundCategory.MASTER,1, 1);
                 }
                 instance.update();
-            } else {
+            } else { //If they clicked a category
                 SoundViewerMenu menu = new SoundViewerMenu((SoundsContainer) this.base);
                 menu.openMenu(player);
                 menu.selected = selected;
@@ -201,6 +254,7 @@ public class SoundViewerMenu extends MenuBase {
     public static void openForPlayer(Player player) {
         MenuBase menu;
         PlayerCache cache = PlayerCache.getCache(player);
+        cache.recalculateMax();
         if (cache.getLastOpen() != null) {
             menu = cache.getLastOpen();
         } else {

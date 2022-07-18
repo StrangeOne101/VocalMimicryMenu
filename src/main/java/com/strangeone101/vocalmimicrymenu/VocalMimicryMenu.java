@@ -25,13 +25,18 @@ public final class VocalMimicryMenu extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new MenuListener(), this);
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
 
-        Permission perm = Bukkit.getPluginManager().getPermission("bending.command.vocalmenu");
-        if (perm == null) {
-            perm = new Permission("bending.command.vocalmenu");
-            Bukkit.getPluginManager().addPermission(perm);
-        }
+        String[] perms = new String[] {"bending.command.vocalmenu", "bending.command.vocalmenu.favorite", "bending.command.vocalmenu.favorite.5"};
         Permission parent = Bukkit.getPluginManager().getPermission("bending.player");
-        perm.addParent(parent, true);
+        for (String s : perms) {
+            Permission perm = Bukkit.getPluginManager().getPermission(s);
+            if (perm == null) {
+                perm = new Permission(s);
+                Bukkit.getPluginManager().addPermission(perm);
+            }
+            perm.addParent(parent, true);
+        }
+
+        DatabaseUtil.createDB();
 
         getLogger().info("VocalMimicryMenu has been enabled!");
     }

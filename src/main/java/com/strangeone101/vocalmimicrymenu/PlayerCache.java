@@ -13,14 +13,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class PlayerCache {
 
     private static Map<Player, PlayerCache> CACHE = new HashMap<>();
 
+    public static final int HARDCODED_MAX_FAVORITES = 9;
+
     private Player player;
     private MenuBase lastOpen;
     private Sound setSound;
+    private int maxFavorites;
     private List<SoundWrapper> favorites = new ArrayList<>();
 
     PlayerCache(Player player) {
@@ -34,6 +38,9 @@ public class PlayerCache {
                 if (wrapperBase instanceof SoundWrapper) favorites.add((SoundWrapper) wrapperBase);
             });
         });
+
+        recalculateMax();
+
         CACHE.put(player, this);
     }
 
@@ -50,8 +57,53 @@ public class PlayerCache {
         }, 20 * 10); //Wait 10 seconds before releasing cache
     }
 
+    public boolean isFavorite(SoundWrapper wrapper) {
+        return favorites.contains(wrapper);
+    }
+
+    public boolean isFavorite(SoundWrapperBase wrapper) {
+        return wrapper instanceof SoundWrapper && isFavorite((SoundWrapper) wrapper);
+    }
+
+    public boolean canFavorite() {
+        return player.hasPermission("bending.command.vocalmenu.favorite");
+    }
+
+    public int getMaxFavorites() {
+        return maxFavorites;
+    }
+
     public List<SoundWrapper> getFavorites() {
-        return favorites;
+        return new ArrayList<>(favorites);
+    }
+
+    public boolean addFavorite(SoundWrapper wrapper) {
+        if (favorites.size() < getMaxFavorites()) {
+            String test = favorites.stream().map(w -> w.path).collect(Collectors.joining(";"));
+            if (test.length() > 512) return false; //Database limitation
+
+            favorites.add(wrapper);
+            saveFavorites();
+            return true;
+        }
+        return false;
+    }
+
+    public void removeFavorite(SoundWrapper wrapper) {
+        favorites.remove(wrapper);
+        saveFavorites();
+    }
+
+    public void recalculateMax() {
+        //Check the max amount of favorites from permissions
+        String base = "bending.command.vocalmenu.favorite.";
+        for (int i = HARDCODED_MAX_FAVORITES; i > 0; i--) {
+            String perm = base + i;
+            if (player.hasPermission(perm)) {
+                this.maxFavorites = i;
+                break;
+            }
+        }
     }
 
     public void saveFavorites() {

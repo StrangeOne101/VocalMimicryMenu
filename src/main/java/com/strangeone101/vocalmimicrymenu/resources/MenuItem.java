@@ -13,7 +13,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public abstract class MenuItem{
 
-	protected List<String> lore = new ArrayList<String>();
+    protected boolean isRightClicked;
+    protected List<String> lore = new ArrayList<String>();
 	protected MenuBase menu;
 	protected int number;
 	protected Material icon;
