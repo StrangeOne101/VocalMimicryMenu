@@ -413,7 +413,7 @@ public class SoundBreakdown {
             if (ALL_MOB_TEXTURES.containsKey(imitateEntity)) {
                 return ItemUtils.getFromString(ALL_MOB_TEXTURES.get(imitateEntity));
             }
-        } else if (type.equals("note_block") && category == Category.BLOCKS) {
+        } else if (type.equalsIgnoreCase("note_block") && category == Category.BLOCKS) {
             switch (soundExtension.toUpperCase()) {
                 case "BASS": return new ItemStack(Material.OAK_PLANKS);
                 case "SNARE": return new ItemStack(Material.SAND);
