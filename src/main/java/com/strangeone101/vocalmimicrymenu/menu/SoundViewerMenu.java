@@ -1,5 +1,6 @@
 package com.strangeone101.vocalmimicrymenu.menu;
 
+import com.strangeone101.vocalmimicrymenu.PlayerCache;
 import com.strangeone101.vocalmimicrymenu.SoundBreakdown;
 import com.strangeone101.vocalmimicrymenu.VocalMimicryMenu;
 import com.strangeone101.vocalmimicrymenu.resources.MenuBase;
@@ -7,21 +8,13 @@ import com.strangeone101.vocalmimicrymenu.resources.MenuItem;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapper;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapperBase;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundsContainer;
-import me.simplicitee.project.addons.ability.air.VocalMimicry;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SoundViewerMenu extends MenuBase {
-
-    private static Map<Player, SoundViewerMenu> LAST_OPEN = new HashMap<>();
-    private static Map<Player, Sound> SET = new HashMap<>();
-
 
     private SoundWrapper selected;
     private SoundsContainer open;
@@ -29,6 +22,7 @@ public class SoundViewerMenu extends MenuBase {
     private SoundViewerMenu prev;
     private final SoundViewerMenu instance = this;
     private Player player;
+    private PlayerCache cache;
 
     public SoundViewerMenu(SoundsContainer soundsContainer) {
         super(getTitle(soundsContainer), getRowSize(soundsContainer));
@@ -55,7 +49,7 @@ public class SoundViewerMenu extends MenuBase {
 
     public MenuItem getItemFor(SoundWrapperBase soundWrapper) {
         MenuItem item = new SoundItem(soundWrapper);
-        boolean set = SET.containsKey(player) && soundWrapper instanceof SoundWrapper && SET.get(player).equals(((SoundWrapper) soundWrapper).sound);
+        boolean set = cache.getSetSound() != null && soundWrapper instanceof SoundWrapper && cache.getSetSound() == (((SoundWrapper) soundWrapper).sound);
 
         if (soundWrapper instanceof SoundWrapper) {
             SoundWrapper wrapper = (SoundWrapper) soundWrapper;
@@ -160,9 +154,10 @@ public class SoundViewerMenu extends MenuBase {
     public void openMenu(Player player) {
         super.openMenu(player);
         this.player = player;
+        this.cache = PlayerCache.getCache(player);
         update();
 
-        LAST_OPEN.put(player, this);
+        cache.setLastOpen(this);
     }
 
     public class SoundItem extends MenuItem {
@@ -182,7 +177,7 @@ public class SoundViewerMenu extends MenuBase {
                     if (VocalMimicryMenu.setVocalSound(player, ((SoundWrapper) this.base).sound)) {
                         player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
                         player.sendMessage(ChatColor.GREEN + "VocalMimicry sound set to " + ((SoundWrapper) this.base).sound.name());
-                        SET.put(player, ((SoundWrapper) this.base).sound);
+                        cache.setSetSound(((SoundWrapper) this.base).sound);
                     } else {
                         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_FALL, 1, 0.6F);
                         player.sendMessage(ChatColor.RED + "You are not allowed to use the sound " + ((SoundWrapper) this.base).sound.name() + "!");
@@ -204,17 +199,13 @@ public class SoundViewerMenu extends MenuBase {
     }
 
     public static void openForPlayer(Player player) {
-        SoundViewerMenu menu;
-        if (LAST_OPEN.containsKey(player)) {
-            menu = LAST_OPEN.get(player);
+        MenuBase menu;
+        PlayerCache cache = PlayerCache.getCache(player);
+        if (cache.getLastOpen() != null) {
+            menu = cache.getLastOpen();
         } else {
             menu = new SoundViewerMenu(SoundBreakdown.getInstance().BASE);
         }
         menu.openMenu(player);
-    }
-
-    public static void releaseMemory(Player player) {
-        LAST_OPEN.remove(player);
-        SET.remove(player);
     }
 }

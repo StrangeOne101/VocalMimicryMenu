@@ -17,9 +17,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Listener implements org.bukkit.event.Listener {
 
+    private final String[] help = new String[] {"help", "h"};
+
     @EventHandler
     public void playerLeave(PlayerQuitEvent event) {
-        SoundViewerMenu.releaseMemory(event.getPlayer());
+        PlayerCache.release(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -30,7 +32,7 @@ public class Listener implements org.bukkit.event.Listener {
         Bukkit.getScheduler().runTaskLater(VocalMimicryMenu.INSTANCE, () -> {
             for (String s : Commands.commandaliases) {
                 if (splits[0].equals("/" + s)) {
-                    for (String s1 : PKCommand.instances.get("help").getAliases()) {
+                    for (String s1 : help) {
                         if (splits[1].equals(s1) && splits[2].equalsIgnoreCase("VocalMimicry")) {
                             String string = ChatColor.YELLOW + "Want to set the sound of VocalMimicry easily?";
                             player.sendMessage(string);
