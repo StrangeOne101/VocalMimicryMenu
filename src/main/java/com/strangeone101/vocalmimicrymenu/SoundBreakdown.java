@@ -3,7 +3,7 @@ package com.strangeone101.vocalmimicrymenu;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapper;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundWrapperBase;
 import com.strangeone101.vocalmimicrymenu.wrapper.SoundsContainer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -89,6 +89,8 @@ public class SoundBreakdown {
         PASSIVE_MOB_TEXTURES.put("frog", "PLAYER_HEAD:ce62e8a048d040eb0533ba26a866cd9c2d0928c931c50b4482ac3a3261fab6f0");
         PASSIVE_MOB_TEXTURES.put("tadpole", "PLAYER_HEAD:b23ebf26b7a441e10a86fb5c2a5f3b519258a5c5dddd6a1a75549f517332815b");
         PASSIVE_MOB_TEXTURES.put("allay", "PLAYER_HEAD:beea845cc0b58ff763decffe11cd1c845c5d09c3b04fe80b0663da5c7c699eb3");
+        PASSIVE_MOB_TEXTURES.put("camel", "PLAYER_HEAD:74b8a333dfa92e7e5a95ad4ae2d84b1bafa33dc28c054925277f60e79dafc8c4");
+        PASSIVE_MOB_TEXTURES.put("sniffer", "PLAYER_HEAD:43f3be09a7353eeae94d88320cb5b242de2f719c0e5c16a486327c605db1d463");
 
         HOSTILE_TEXTURES = ALL_MOB_TEXTURES.size();
 
@@ -231,7 +233,7 @@ public class SoundBreakdown {
                 String[] split = asString.split("_");
                 for (int i = split.length - 1; i > 0; i--) {
 
-                    String attempedMobName = StringUtils.join(Arrays.copyOfRange(split, 0, i), "_");
+                    String attempedMobName = Strings.join(Arrays.asList(Arrays.copyOfRange(split, 0, i)), '_');
                     if (allMobKeys.contains(attempedMobName)) {
                         String mobType = PASSIVE_MOB_TEXTURES.containsKey(attempedMobName) ? "passive" :
                                 HOSTILE_MOB_TEXTURES.containsKey(attempedMobName) ? "hostile" :
@@ -241,6 +243,14 @@ public class SoundBreakdown {
                         ItemStack stack = getSoundItemStack(Category.MOBS, attempedMobName, soundType);
                         String name = sound.name().substring("entity_".length());
                         SoundWrapper wrapper = new SoundWrapper("mobs." + mobType + "." + attempedMobName + "." + soundType.toLowerCase(), sound, stack, getFancyName(name));
+                        wrapper.addToContainer(getEntityContainer(attempedMobName));
+                        wrapper.register();
+                        continue soundloop;
+                    } else {
+                        String soundType = asString.substring(attempedMobName.length() + 1);
+                        ItemStack stack = getSoundItemStack(Category.MOBS, attempedMobName, soundType);
+                        String name = sound.name().substring("entity_".length());
+                        SoundWrapper wrapper = new SoundWrapper("mobs.other." + attempedMobName + "." + soundType.toLowerCase(), sound, stack, getFancyName(name));
                         wrapper.addToContainer(getEntityContainer(attempedMobName));
                         wrapper.register();
                         continue soundloop;
@@ -313,8 +323,8 @@ public class SoundBreakdown {
                 else if (asString.equals("nether_nether_wastes")) material = Material.NETHERRACK;
                 else if (asString.equals("nether_soul_sand_valley")) material = Material.SOUL_SAND;
                 else if (asString.equals("nether_warped_forest")) material = Material.getMaterial("WARPED_WART_BLOCK");
-                else if (asString.equals("overworld_deep_dark")) material = Material.getMaterial("DEEPSALE_TILES");
-                else if (asString.equals("overworld_dripstone_cave")) material = Material.getMaterial("DRIPSTONE_BLOCK");
+                else if (asString.equals("overworld_deep_dark")) material = Material.getMaterial("DEEPSLATE_TILES");
+                else if (asString.equals("overworld_dripstone_caves")) material = Material.getMaterial("DRIPSTONE_BLOCK");
                 else if (asString.equals("overworld_frozen_peaks")) material = Material.PACKED_ICE;
                 else if (asString.equals("overworld_grove")) material = Material.GRASS_BLOCK;
                 else if (asString.equals("overworld_jagged_peaks")) material = Material.ANDESITE;
@@ -386,14 +396,17 @@ public class SoundBreakdown {
 
     private SoundsContainer getEntityContainer(String entityName) {
         String mobType = PASSIVE_MOB_TEXTURES.containsKey(entityName.toLowerCase()) ? "passive" :
-                HOSTILE_MOB_TEXTURES.containsKey(entityName.toLowerCase()) ? "hostile" :
-                        OTHER_MOB_TEXTURES.containsKey(entityName.toLowerCase()) ? "other" : "bugged";
+                HOSTILE_MOB_TEXTURES.containsKey(entityName.toLowerCase()) ? "hostile" : "other";
 
         SoundWrapperBase container = SOUND_ENTRIES.get("mobs." + mobType + "." + entityName.toLowerCase());
         if (container == null) {
             String stackString = ALL_MOB_TEXTURES.get(entityName.toLowerCase());
 
-            if (stackString == null) stackString = "EGG";
+            if (stackString == null) {
+                Material spawnEgg = Material.getMaterial(mobType.toUpperCase() + "_SPAWN_EGG");
+                if (spawnEgg != null) stackString = spawnEgg.name();
+                else stackString = "EGG";
+            }
             ItemStack stack = ItemUtils.getFromString(stackString);
 
             container = new SoundsContainer("mobs." + mobType + "." + entityName.toLowerCase(), stack, getFancyName(entityName));
@@ -458,7 +471,7 @@ public class SoundBreakdown {
             } else if (type.equalsIgnoreCase("armor_equip")) {
                 switch (soundExtension.toUpperCase()) {
                     case "LEATHER": return new ItemStack(Material.LEATHER_CHESTPLATE);
-                    case "CHAINMAIL": return new ItemStack(Material.CHAINMAIL_CHESTPLATE);
+                    case "CHAIN": return new ItemStack(Material.CHAINMAIL_CHESTPLATE);
                     case "GENERIC":
                     case "IRON": return new ItemStack(Material.IRON_CHESTPLATE);
                     case "DIAMOND": return new ItemStack(Material.DIAMOND_CHESTPLATE);
