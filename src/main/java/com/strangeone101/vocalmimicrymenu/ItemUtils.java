@@ -1,7 +1,5 @@
 package com.strangeone101.vocalmimicrymenu;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -10,10 +8,11 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.bukkit.profile.PlayerProfile;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Base64;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.util.Random;
 import java.util.UUID;
@@ -54,8 +53,17 @@ public class ItemUtils {
     public static SkullMeta setSkinFromURL(SkullMeta meta, String skin) {
         Random random = new Random(skin.hashCode());
 
+        PlayerProfile profile = Bukkit.createPlayerProfile(new UUID(random.nextLong(), random.nextLong()));
+
+        try {
+            profile.getTextures().setSkin(new URL(skin));
+            meta.setOwnerProfile(profile);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
         //The UUID must be using a random seeded from the hashcode, so the item can stack
-        GameProfile profile = new GameProfile(new UUID(random.nextLong(), random.nextLong()), null);
+        /*GameProfile profile = new GameProfile(new UUID(random.nextLong(), random.nextLong()), null);
         byte[] encodedData = Base64.getEncoder()
                 .encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", skin).getBytes());
         profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
@@ -68,7 +76,7 @@ public class ItemUtils {
             setProfile.invoke(meta, profile);
         } catch (IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e1) {
             e1.printStackTrace();
-        }
+        }*/
         return meta;
     }
 

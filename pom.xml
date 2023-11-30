@@ -6,7 +6,7 @@
 
     <groupId>com.strangeone101.vocalmimicrygui</groupId>
     <artifactId>VocalMimicryMenu</artifactId>
-    <version>1.2</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
 
     <name>VocalMimicryMenu</name>
@@ -66,25 +66,29 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-releases/</url>
         </repository>
+        <repository>
+            <id>minecraft-repo</id>
+            <url>https://libraries.minecraft.net/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <artifactId>spigot</artifactId>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>1.5.25</version>
+            <version>3.18.38</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.projectkorra</groupId>
             <artifactId>projectkorra</artifactId>
-            <version>1.9.3</version>
+            <version>1.11.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
